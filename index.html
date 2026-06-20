@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sean — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0d0d0d; --white: #ffffff; --off-white: #f7f7f5; --mid: #6b6b6b;
+      --border: #e4e4e0; --accent: #2563eb; --accent-light: #dbeafe;
+      --radius: 12px; --radius-sm: 6px;
+      --font-display: 'DM Serif Display', serif; --font-body: 'DM Sans', sans-serif;
+      --transition: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-body); background: var(--white); color: var(--black); -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+    .cursor-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: transform 0.08s ease, opacity 0.2s ease; mix-blend-mode: multiply; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 32px; }
+    .section { padding: 100px 0; }
+    .section-label { font-family: var(--font-body); font-size: 11px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+    .section-heading { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; margin-bottom: 48px; color: var(--black); }
+    nav.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 1000; display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid transparent; transition: border-color var(--transition); }
+    nav.nav.scrolled { border-color: var(--border); }
+    .nav-logo { font-family: var(--font-display); font-size: 1.3rem; color: var(--black); text-decoration: none; letter-spacing: -0.01em; }
+    .nav-links { display: flex; gap: 36px; }
+    .nav-links a { font-size: 0.875rem; font-weight: 500; color: var(--mid); text-decoration: none; transition: color var(--transition); }
+    .nav-links a:hover { color: var(--black); }
+    .nav-menu-btn { display: none; flex-direction: column; gap: 5px; background: none; border: none; cursor: pointer; padding: 4px; }
+    .nav-menu-btn span { display: block; width: 22px; height: 2px; background: var(--black); border-radius: 2px; }
+    .mobile-menu { position: fixed; inset: 0; background: var(--white); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; transform: translateX(100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .mobile-menu.open { transform: translateX(0); }
+    .mobile-link { font-family: var(--font-display); font-size: 2rem; color: var(--black); text-decoration: none; }
+    .mobile-menu-close { position: absolute; top: 20px; right: 24px; font-size: 1.5rem; background: none; border: none; cursor: pointer; color: var(--mid); }
+    .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; background: var(--off-white); text-align: center; padding: 120px 32px 80px; position: relative; }
+    .hero-inner { max-width: 700px; }
+    .hero-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+    .hero-name { font-family: var(--font-display); font-size: clamp(4rem, 14vw, 9rem); line-height: 0.92; letter-spacing: -0.03em; color: var(--black); margin-bottom: 24px; }
+    .hero-tagline { font-size: clamp(1rem, 2.5vw, 1.25rem); font-weight: 300; color: var(--mid); margin-bottom: 52px; }
+    .hero-stats { display: flex; justify-content: center; gap: 48px; margin-bottom: 48px; flex-wrap: wrap; }
+    .stat { display: flex; flex-direction: column; align-items: center; }
+    .stat-number { font-family: var(--font-display); font-size: 2.5rem; color: var(--black); line-height: 1; }
+    .stat-label { font-size: 0.75rem; font-weight: 500; color: var(--mid); margin-top: 6px; letter-spacing: 0.04em; }
+    .hero-cta { display: inline-block; background: var(--black); color: var(--white); text-decoration: none; font-size: 0.9rem; font-weight: 500; padding: 14px 32px; border-radius: 100px; transition: background var(--transition), transform var(--transition); }
+    .hero-cta:hover { background: var(--accent); transform: translateY(-2px); }
+    .hero-scroll-hint { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--mid); animation: bounce 2s infinite; }
+    @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+    .about { background: var(--white); }
+    .about-grid { display: grid; grid-template-columns: 280px 1fr; gap: 64px; align-items: start; }
+    .about-photo-wrap { position: sticky; top: 90px; }
+    .about-photo-placeholder { width: 100%; aspect-ratio: 3/4; border-radius: var(--radius); border: 2px dashed var(--border); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--mid); font-size: 0.85rem; background: var(--off-white); }
+    .about-photo { width: 100%; aspect-ratio: 3/4; object-fit: cover; border-radius: var(--radius); }
+    .photo-upload-btn { display: inline-block; font-size: 0.8rem; font-weight: 600; padding: 8px 18px; border-radius: 100px; border: 1.5px solid var(--border); cursor: pointer; transition: border-color var(--transition), color var(--transition); color: var(--black); }
+    .photo-upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .about-bio { font-size: 1.1rem; line-height: 1.7; color: var(--black); margin-bottom: 20px; min-height: 80px; border-radius: var(--radius-sm); padding: 4px; transition: background var(--transition); }
+    .about-bio[contenteditable="true"] { background: var(--off-white); outline: none; border: 1.5px solid var(--accent); padding: 12px; }
+    .edit-btn { font-family: var(--font-body); font-size: 0.8rem; font-weight: 600; padding: 8px 18px; border-radius: 100px; border: 1.5px solid var(--border); background: transparent; cursor: pointer; color: var(--mid); transition: all var(--transition); margin-bottom: 24px; }
+    .edit-btn:hover, .edit-btn.active { border-color: var(--accent); color: var(--accent); }
+    .edit-btn.small { font-size: 0.72rem; padding: 5px 12px; margin-bottom: 0; }
+    .about-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .tag { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78rem; font-weight: 500; padding: 5px 12px; border-radius: 100px; background: var(--accent-light); color: var(--accent); }
+    .tag .tag-remove { cursor: pointer; opacity: 0.6; transition: opacity 0.15s; font-size: 0.9em; border: none; background: none; color: inherit; padding: 0; line-height: 1; }
+    .tag .tag-remove:hover { opacity: 1; }
+    .tag-adder { display: flex; gap: 10px; }
+    .tag-input { flex: 1; font-family: var(--font-body); font-size: 0.875rem; padding: 10px 16px; border-radius: 100px; border: 1.5px solid var(--border); outline: none; transition: border-color var(--transition); }
+    .tag-input:focus { border-color: var(--accent); }
+    .tag-add-btn { font-family: var(--font-body); font-size: 0.875rem; font-weight: 600; padding: 10px 22px; border-radius: 100px; border: none; background: var(--black); color: var(--white); cursor: pointer; transition: background var(--transition); }
+    .tag-add-btn:hover { background: var(--accent); }
+    .timeline-section { background: var(--off-white); }
+    .timeline { position: relative; display: flex; flex-direction: column; gap: 0; padding-left: 80px; }
+    .timeline::before { content: ''; position: absolute; left: 32px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+    .timeline-item { position: relative; padding: 0 0 40px 0; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .timeline-item.visible { opacity: 1; transform: translateY(0); }
+    .timeline-item::before { content: ''; position: absolute; left: -54px; top: 6px; width: 12px; height: 12px; border-radius: 50%; background: var(--white); border: 2.5px solid var(--accent); }
+    .timeline-year { font-family: var(--font-display); font-size: 1.6rem; color: var(--black); margin-bottom: 10px; }
+    .timeline-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px 24px; display: flex; flex-direction: column; gap: 10px; max-width: 600px; }
+    .timeline-card-text { font-size: 0.95rem; line-height: 1.6; color: var(--mid); min-height: 40px; }
+    .timeline-card-text[contenteditable="true"] { background: var(--off-white); outline: none; border: 1.5px solid var(--accent); border-radius: var(--radius-sm); padding: 8px; }
+    .add-year-btn { margin-top: 12px; font-family: var(--font-body); font-size: 0.875rem; font-weight: 600; padding: 12px 28px; border-radius: 100px; border: 1.5px solid var(--border); background: transparent; cursor: pointer; color: var(--mid); transition: all var(--transition); }
+    .add-year-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .projects-section { background: var(--white); }
+    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 40px; }
+    .filter-btn { font-family: var(--font-body); font-size: 0.82rem; font-weight: 600; padding: 8px 20px; border-radius: 100px; border: 1.5px solid var(--border); background: transparent; cursor: pointer; color: var(--mid); transition: all var(--transition); letter-spacing: 0.02em; }
+    .filter-btn.active, .filter-btn:hover { background: var(--black); border-color: var(--black); color: var(--white); }
+    .projects-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px; }
+    .project-card { border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; background: var(--off-white); transition: transform var(--transition), box-shadow var(--transition); cursor: default; opacity: 0; transform: translateY(20px); }
+    .project-card.visible { opacity: 1; transform: translateY(0); }
+    .project-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,0.08); }
+    .project-img-wrap { width: 100%; aspect-ratio: 16/10; overflow: hidden; }
+    .project-img-placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--border); background: var(--off-white); }
+    .project-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+    .project-card:hover .project-img-wrap img { transform: scale(1.03); }
+    .project-info { padding: 20px 22px; }
+    .project-year { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.1em; color: var(--mid); text-transform: uppercase; }
+    .project-title { font-family: var(--font-display); font-size: 1.25rem; margin: 6px 0 8px; color: var(--black); }
+    .project-desc { font-size: 0.875rem; line-height: 1.6; color: var(--mid); margin-bottom: 14px; }
+    .project-tag { font-size: 0.72rem; font-weight: 600; padding: 4px 10px; border-radius: 100px; background: var(--accent-light); color: var(--accent); text-transform: capitalize; }
+    .add-project-btn { font-family: var(--font-body); font-size: 0.9rem; font-weight: 600; padding: 14px 32px; border-radius: 100px; border: 1.5px solid var(--border); background: transparent; cursor: pointer; color: var(--mid); transition: all var(--transition); display: block; }
+    .add-project-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .contact { background: var(--off-white); }
+    .contact-inner { text-align: center; }
+    .contact-sub { color: var(--mid); margin-top: -24px; margin-bottom: 36px; font-size: 0.95rem; }
+    .contact-links { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-bottom: 20px; }
+    .contact-link { display: inline-flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 500; color: var(--black); text-decoration: none; padding: 12px 24px; border-radius: 100px; border: 1.5px solid var(--border); background: var(--white); transition: all var(--transition); }
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); }
+    .footer { padding: 28px 32px; text-align: center; font-size: 0.8rem; color: var(--mid); border-top: 1px solid var(--border); }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity var(--transition); backdrop-filter: blur(4px); }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal { background: var(--white); border-radius: 16px; padding: 36px; width: 100%; max-width: 460px; position: relative; transform: translateY(16px); transition: transform var(--transition); }
+    .modal-overlay.open .modal { transform: translateY(0); }
+    .modal-close { position: absolute; top: 16px; right: 16px; font-size: 1rem; background: none; border: none; cursor: pointer; color: var(--mid); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background var(--transition); }
+    .modal-close:hover { background: var(--off-white); }
+    .modal-title { font-family: var(--font-display); font-size: 1.5rem; margin-bottom: 24px; }
+    .modal-field { margin-bottom: 18px; }
+    .modal-field label { display: block; font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mid); margin-bottom: 6px; }
+    .modal-field input, .modal-field select, .modal-field textarea { width: 100%; font-family: var(--font-body); font-size: 0.9rem; padding: 10px 14px; border-radius: var(--radius-sm); border: 1.5px solid var(--border); outline: none; transition: border-color var(--transition); background: var(--white); color: var(--black); }
+    .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color: var(--accent); }
+    .modal-field textarea { resize: vertical; }
+    .modal-submit { width: 100%; font-family: var(--font-body); font-size: 0.9rem; font-weight: 600; padding: 13px; border-radius: 100px; border: none; background: var(--black); color: var(--white); cursor: pointer; transition: background var(--transition); margin-top: 6px; }
+    .modal-submit:hover { background: var(--accent); }
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .nav-menu-btn { display: flex; }
+      nav.nav { padding: 0 20px; }
+      .about-grid { grid-template-columns: 1fr; gap: 36px; }
+      .about-photo-wrap { position: static; max-width: 240px; margin: 0 auto; }
+      .timeline { padding-left: 48px; }
+      .timeline::before { left: 12px; }
+      .timeline-item::before { left: -38px; }
+      .hero-stats { gap: 28px; }
+      .container { padding: 0 20px; }
+      .section { padding: 70px 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <nav class="nav" id="nav">
+    <a href="#" class="nav-logo">Sean</a>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#timeline">Journey</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <button class="nav-menu-btn" id="navMenuBtn" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-menu-close" id="mobileMenuClose">✕</button>
+    <a href="#about" class="mobile-link">About</a>
+    <a href="#timeline" class="mobile-link">Journey</a>
+    <a href="#projects" class="mobile-link">Projects</a>
+    <a href="#contact" class="mobile-link">Contact</a>
+  </div>
+
+  <header class="hero">
+    <div class="hero-inner">
+      <p class="hero-eyebrow">Portfolio</p>
+      <h1 class="hero-name">Sean</h1>
+      <p class="hero-tagline">Growing up one project at a time.</p>
+      <div class="hero-stats">
+        <div class="stat" id="statYears">
+          <span class="stat-number" data-target="0">0</span>
+          <span class="stat-label">Years of Projects</span>
+        </div>
+        <div class="stat" id="statProjects">
+          <span class="stat-number" data-target="0">0</span>
+          <span class="stat-label">Projects Completed</span>
+        </div>
+        <div class="stat" id="statSkills">
+          <span class="stat-number" data-target="0">0</span>
+          <span class="stat-label">Skills Unlocked</span>
+        </div>
+      </div>
+      <a href="#projects" class="hero-cta">See the Work ↓</a>
+    </div>
+    <div class="hero-scroll-hint">scroll</div>
+  </header>
+
+  <section class="about section" id="about">
+    <div class="container">
+      <div class="section-label">01 — About</div>
+      <div class="about-grid">
+        <div class="about-photo-wrap">
+          <div class="about-photo-placeholder" id="photoPlaceholder">
+            <span>Add a photo</span>
+            <label class="photo-upload-btn" for="photoUpload">Upload Photo</label>
+            <input type="file" id="photoUpload" accept="image/*" hidden />
+          </div>
+          <img class="about-photo" id="aboutPhoto" src="" alt="Sean" style="display:none" />
+        </div>
+        <div class="about-text">
+          <h2 class="section-heading">Hey, I'm Sean.</h2>
+          <div class="about-bio" id="aboutBio" contenteditable="false">
+            A curious kid who loves building things, learning new skills, and taking on challenges. This site is a living record of the journey — from early experiments to projects I'm genuinely proud of.
+          </div>
+          <button class="edit-btn" data-target="aboutBio">Edit Bio</button>
+          <div class="about-tags" id="aboutTags">
+            <span class="tag">Add your interests below</span>
+          </div>
+          <div class="tag-adder">
+            <input type="text" class="tag-input" id="tagInput" placeholder="Add an interest or skill…" maxlength="30" />
+            <button class="tag-add-btn" id="tagAddBtn">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="timeline-section section" id="timeline">
+    <div class="container">
+      <div class="section-label">02 — Journey</div>
+      <h2 class="section-heading">Year by Year</h2>
+      <div class="timeline" id="timelineEl">
+        <div class="timeline-item" data-year="2020">
+          <div class="timeline-year">2020</div>
+          <div class="timeline-card">
+            <p class="timeline-card-text" contenteditable="false">Add a memory or milestone from this year…</p>
+            <button class="edit-btn small">Edit</button>
+          </div>
+        </div>
+        <div class="timeline-item" data-year="2021">
+          <div class="timeline-year">2021</div>
+          <div class="timeline-card">
+            <p class="timeline-card-text" contenteditable="false">Add a memory or milestone from this year…</p>
+            <button class="edit-btn small">Edit</button>
+          </div>
+        </div>
+        <div class="timeline-item" data-year="2022">
+          <div class="timeline-year">2022</div>
+          <div class="timeline-card">
+            <p class="timeline-card-text" contenteditable="false">Add a memory or milestone from this year…</p>
+            <button class="edit-btn small">Edit</button>
+          </div>
+        </div>
+        <div class="timeline-item" data-year="2023">
+          <div class="timeline-year">2023</div>
+          <div class="timeline-card">
+            <p class="timeline-card-text" contenteditable="false">Add a memory or milestone from this year…</p>
+            <button class="edit-btn small">Edit</button>
+          </div>
+        </div>
+        <div class="timeline-item" data-year="2024">
+          <div class="timeline-year">2024</div>
+          <div class="timeline-card">
+            <p class="timeline-card-text" contenteditable="false">Add a memory or milestone from this year…</p>
+            <button class="edit-btn small">Edit</button>
+          </div>
+        </div>
+      </div>
+      <button class="add-year-btn" id="addYearBtn">+ Add Another Year</button>
+    </div>
+  </section>
+
+  <section class="projects-section section" id="projects">
+    <div class="container">
+      <div class="section-label">03 — Projects</div>
+      <h2 class="section-heading">The Work</h2>
+      <div class="filter-bar" id="filterBar">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="art">Art</button>
+        <button class="filter-btn" data-filter="code">Code</button>
+        <button class="filter-btn" data-filter="sports">Sports</button>
+        <button class="filter-btn" data-filter="other">Other</button>
+      </div>
+      <div class="projects-grid" id="projectsGrid">
+        <div class="project-card placeholder-card" data-category="art">
+          <div class="project-img-wrap">
+            <div class="project-img-placeholder">
+              <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 16l4-8H8l4 8z"/><circle cx="12" cy="12" r="10"/></svg>
+            </div>
+          </div>
+          <div class="project-info">
+            <span class="project-year">Year</span>
+            <h3 class="project-title">Art Project Title</h3>
+            <p class="project-desc">Describe this project — what it was, why it mattered.</p>
+            <span class="project-tag">Art</span>
+          </div>
+        </div>
+        <div class="project-card placeholder-card" data-category="code">
+          <div class="project-img-wrap">
+            <div class="project-img-placeholder">
+              <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+          </div>
+          <div class="project-info">
+            <span class="project-year">Year</span>
+            <h3 class="project-title">Coding Project Title</h3>
+            <p class="project-desc">Describe this project — what it was, why it mattered.</p>
+            <span class="project-tag">Code</span>
+          </div>
+        </div>
+        <div class="project-card placeholder-card" data-category="sports">
+          <div class="project-img-wrap">
+            <div class="project-img-placeholder">
+              <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+          </div>
+          <div class="project-info">
+            <span class="project-year">Year</span>
+            <h3 class="project-title">Sports Achievement</h3>
+            <p class="project-desc">Describe this achievement — what it was, why it mattered.</p>
+            <span class="project-tag">Sports</span>
+          </div>
+        </div>
+      </div>
+      <button class="add-project-btn" id="addProjectBtn">+ Add a Project</button>
+    </div>
+  </section>
+
+  <section class="contact section" id="contact">
+    <div class="container contact-inner">
+      <div class="section-label">04 — Contact</div>
+      <h2 class="section-heading">Get in Touch</h2>
+      <p class="contact-sub">Want to reach out? Edit the links below to add your real contact info.</p>
+      <div class="contact-links">
+        <a class="contact-link" id="contactEmail" href="mailto:your@email.com">
+          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+          your@email.com
+        </a>
+        <a class="contact-link" id="contactGithub" href="https://github.com" target="_blank" rel="noopener">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"/></svg>
+          GitHub
+        </a>
+      </div>
+      <button class="edit-btn" id="editContactBtn">Edit Contact Info</button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <p>Built with care · Sean's Portfolio · <span id="footerYear"></span></p>
+  </footer>
+
+  <div class="modal-overlay" id="addProjectModal">
+    <div class="modal">
+      <button class="modal-close" id="closeProjectModal">✕</button>
+      <h3 class="modal-title">Add a Project</h3>
+      <div class="modal-field"><label>Project Title</label><input type="text" id="newProjectTitle" placeholder="e.g. Watercolor Sunset" /></div>
+      <div class="modal-field"><label>Year</label><input type="text" id="newProjectYear" placeholder="e.g. 2023" maxlength="4" /></div>
+      <div class="modal-field"><label>Category</label><select id="newProjectCategory"><option value="art">Art</option><option value="code">Code</option><option value="sports">Sports</option><option value="other">Other</option></select></div>
+      <div class="modal-field"><label>Description</label><textarea id="newProjectDesc" placeholder="Describe this project…" rows="3"></textarea></div>
+      <div class="modal-field"><label>Project Image (optional)</label><input type="file" id="newProjectImage" accept="image/*" /></div>
+      <button class="modal-submit" id="submitProject">Add Project</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="addYearModal">
+    <div class="modal">
+      <button class="modal-close" id="closeYearModal">✕</button>
+      <h3 class="modal-title">Add a Year</h3>
+      <div class="modal-field"><label>Year</label><input type="text" id="newYear" placeholder="e.g. 2025" maxlength="4" /></div>
+      <div class="modal-field"><label>Milestone or Memory</label><textarea id="newYearText" placeholder="What happened this year?" rows="3"></textarea></div>
+      <button class="modal-submit" id="submitYear">Add Year</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="editContactModal">
+    <div class="modal">
+      <button class="modal-close" id="closeContactModal">✕</button>
+      <h3 class="modal-title">Edit Contact Info</h3>
+      <div class="modal-field"><label>Email Address</label><input type="email" id="editEmail" placeholder="your@email.com" /></div>
+      <div class="modal-field"><label>GitHub URL</label><input type="url" id="editGithub" placeholder="https://github.com/yourname" /></div>
+      <button class="modal-submit" id="submitContact">Save</button>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const $ = (sel) => document.querySelector(sel);
+      const $$ = (sel) => document.querySelectorAll(sel);
+      const state = loadState();
+
+      const nav = $('#nav');
+      window.addEventListener('scroll', () => nav.classList.toggle('scrolled', window.scrollY > 20));
+
+      const dot = $('#cursorDot');
+      document.addEventListener('mousemove', (e) => { dot.style.left = e.clientX + 'px'; dot.style.top = e.clientY + 'px'; });
+
+      const navMenuBtn = $('#navMenuBtn');
+      const mobileMenu = $('#mobileMenu');
+      navMenuBtn.addEventListener('click', () => mobileMenu.classList.add('open'));
+      $('#mobileMenuClose').addEventListener('click', () => mobileMenu.classList.remove('open'));
+      $$('.mobile-link').forEach(link => link.addEventListener('click', () => mobileMenu.classList.remove('open')));
+
+      const statEls = { years: $('#statYears .stat-number'), projects: $('#statProjects .stat-number'), skills: $('#statSkills .stat-number') };
+
+      function updateStats() {
+        return { years: $$('.timeline-item').length, projects: $$('.project-card').length, skills: state.tags.length };
+      }
+
+      function animateStat(el, target, delay) {
+        setTimeout(() => {
+          const duration = 1200, startTime = performance.now();
+          const tick = (now) => {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(eased * target);
+            if (progress < 1) requestAnimationFrame(tick);
+          };
+          requestAnimationFrame(tick);
+        }, delay);
+      }
+
+      const heroObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const t = updateStats();
+            animateStat(statEls.years, t.years, 0);
+            animateStat(statEls.projects, t.projects, 150);
+            animateStat(statEls.skills, t.skills, 300);
+            heroObserver.disconnect();
+          }
+        });
+      }, { threshold: 0.4 });
+      heroObserver.observe($('.hero'));
+
+      const scrollObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+      }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+      function observeAll() { $$('.project-card, .timeline-item').forEach(el => scrollObserver.observe(el)); }
+      observeAll();
+
+      const photoInput = $('#photoUpload');
+      const aboutPhoto = $('#aboutPhoto');
+      const photoPlaceholder = $('#photoPlaceholder');
+
+      if (state.photo) { aboutPhoto.src = state.photo; aboutPhoto.style.display = 'block'; photoPlaceholder.style.display = 'none'; }
+
+      photoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          aboutPhoto.src = ev.target.result;
+          aboutPhoto.style.display = 'block';
+          photoPlaceholder.style.display = 'none';
+          state.photo = ev.target.result;
+          saveState();
+        };
+        reader.readAsDataURL(file);
+      });
+
+      const aboutBio = $('#aboutBio');
+      const editBioBtn = $('[data-target="aboutBio"]');
+      if (state.bio) aboutBio.textContent = state.bio;
+      editBioBtn.addEventListener('click', () => {
+        const isEditing = aboutBio.getAttribute('contenteditable') === 'true';
+        if (isEditing) {
+          aboutBio.setAttribute('contenteditable', 'false');
+          editBioBtn.textContent = 'Edit Bio';
+          editBioBtn.classList.remove('active');
+          state.bio = aboutBio.textContent;
+          saveState();
+        } else {
+          aboutBio.setAttribute('contenteditable', 'true');
+          aboutBio.focus();
+          editBioBtn.textContent = 'Save Bio';
+          editBioBtn.classList.add('active');
+        }
+      });
+
+      const aboutTags = $('#aboutTags');
+      const tagInput = $('#tagInput');
+
+      function renderTags() {
+        aboutTags.innerHTML = '';
+        if (!state.tags.length) { aboutTags.innerHTML = '<span class="tag">Add your interests below</span>'; return; }
+        state.tags.forEach((t, i) => {
+          const span = document.createElement('span');
+          span.className = 'tag';
+          span.innerHTML = t + ' <button class="tag-remove" data-idx="' + i + '">✕</button>';
+          aboutTags.appendChild(span);
+        });
+        $$('.tag-remove').forEach(btn => btn.addEventListener('click', () => {
+          state.tags.splice(parseInt(btn.dataset.idx), 1);
+          saveState(); renderTags();
+        }));
+      }
+      renderTags();
+
+      function addTag() {
+        const val = tagInput.value.trim();
+        if (!val || state.tags.includes(val)) return;
+        state.tags.push(val); tagInput.value = '';
+        saveState(); renderTags();
+      }
+      $('#tagAddBtn').addEventListener('click', addTag);
+      tagInput.addEventListener('keydown', e => { if (e.key === 'Enter') addTag(); });
+
+      const timelineEl = $('#timelineEl');
+
+      function bindTimelineEdit(item) {
+        const btn = item.querySelector('.edit-btn.small');
+        const textEl = item.querySelector('.timeline-card-text');
+        if (!btn || btn.dataset.bound) return;
+        btn.dataset.bound = 'true';
+        btn.addEventListener('click', () => {
+          const isEditing = textEl.getAttribute('contenteditable') === 'true';
+          if (isEditing) {
+            textEl.setAttribute('contenteditable', 'false');
+            btn.textContent = 'Edit'; btn.classList.remove('active');
+            saveTimelineState();
+          } else {
+            textEl.setAttribute('contenteditable', 'true');
+            textEl.focus(); btn.textContent = 'Save'; btn.classList.add('active');
+          }
+        });
+      }
+
+      function saveTimelineState() {
+        state.timeline = [];
+        $$('.timeline-item').forEach(item => {
+          state.timeline.push({ year: item.dataset.year, text: item.querySelector('.timeline-card-text').textContent.trim() });
+        });
+        saveState();
+      }
+
+      function makeTimelineItem(year, text) {
+        const item = document.createElement('div');
+        item.className = 'timeline-item';
+        item.dataset.year = year;
+        item.innerHTML = '<div class="timeline-year">' + year + '</div><div class="timeline-card"><p class="timeline-card-text" contenteditable="false">' + text + '</p><button class="edit-btn small">Edit</button></div>';
+        bindTimelineEdit(item);
+        return item;
+      }
+
+      if (state.timeline && state.timeline.length) {
+        timelineEl.innerHTML = '';
+        state.timeline.forEach(entry => { timelineEl.appendChild(makeTimelineItem(entry.year, entry.text)); });
+      } else {
+        $$('.timeline-item').forEach(item => bindTimelineEdit(item));
+      }
+      observeAll();
+
+      $('#addYearBtn').addEventListener('click', () => $('#addYearModal').classList.add('open'));
+      $('#closeYearModal').addEventListener('click', () => $('#addYearModal').classList.remove('open'));
+      $('#addYearModal').addEventListener('click', e => { if (e.target === $('#addYearModal')) $('#addYearModal').classList.remove('open'); });
+      $('#submitYear').addEventListener('click', () => {
+        const year = $('#newYear').value.trim();
+        const text = $('#newYearText').value.trim();
+        if (!year) return;
+        const item = makeTimelineItem(year, text || 'Add a memory…');
+        timelineEl.appendChild(item);
+        scrollObserver.observe(item);
+        saveTimelineState();
+        $('#addYearModal').classList.remove('open');
+        $('#newYear').value = ''; $('#newYearText').value = '';
+      });
+
+      const projectsGrid = $('#projectsGrid');
+
+      function buildProjectCard(title, year, category, desc, imgSrc) {
+        const icons = {
+          art: '<svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 16l4-8H8l4 8z"/><circle cx="12" cy="12" r="10"/></svg>',
+          code: '<svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
+          sports: '<svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>',
+          other: '<svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/><circle cx="5" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>'
+        };
+        const card = document.createElement('div');
+        card.className = 'project-card';
+        card.dataset.category = category;
+        const imgHTML = imgSrc ? '<img src="' + imgSrc + '" alt="' + title + '" />' : '<div class="project-img-placeholder">' + (icons[category] || icons.other) + '</div>';
+        card.innerHTML = '<div class="project-img-wrap">' + imgHTML + '</div><div class="project-info"><span class="project-year">' + year + '</span><h3 class="project-title">' + title + '</h3><p class="project-desc">' + desc + '</p><span class="project-tag">' + category + '</span></div>';
+        return card;
+      }
+
+      if (state.projects && state.projects.length) {
+        state.projects.forEach(p => { projectsGrid.appendChild(buildProjectCard(p.title, p.year, p.category, p.desc, p.img)); });
+        observeAll();
+      }
+
+      let activeFilter = 'all';
+      function applyFilter(filter) {
+        activeFilter = filter;
+        $$('.project-card').forEach(card => { card.style.display = (filter === 'all' || card.dataset.category === filter) ? '' : 'none'; });
+      }
+
+      $$('.filter-btn').forEach(btn => btn.addEventListener('click', () => {
+        $$('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyFilter(btn.dataset.filter);
+      }));
+
+      $('#addProjectBtn').addEventListener('click', () => $('#addProjectModal').classList.add('open'));
+      $('#closeProjectModal').addEventListener('click', () => $('#addProjectModal').classList.remove('open'));
+      $('#addProjectModal').addEventListener('click', e => { if (e.target === $('#addProjectModal')) $('#addProjectModal').classList.remove('open'); });
+      $('#submitProject').addEventListener('click', () => {
+        const title = $('#newProjectTitle').value.trim();
+        const year = $('#newProjectYear').value.trim();
+        const category = $('#newProjectCategory').value;
+        const desc = $('#newProjectDesc').value.trim();
+        const imageFile = $('#newProjectImage').files[0];
+        if (!title) return;
+        const save = (imgSrc) => {
+          const card = buildProjectCard(title, year || '—', category, desc || 'No description yet.', imgSrc);
+          projectsGrid.appendChild(card);
+          scrollObserver.observe(card);
+          applyFilter(activeFilter);
+          state.projects.push({ title, year, category, desc, img: imgSrc });
+          saveState();
+          $('#addProjectModal').classList.remove('open');
+          $('#newProjectTitle').value = ''; $('#newProjectYear').value = '';
+          $('#newProjectDesc').value = ''; $('#newProjectImage').value = '';
+        };
+        if (imageFile) { const r = new FileReader(); r.onload = ev => save(ev.target.result); r.readAsDataURL(imageFile); }
+        else save(null);
+      });
+
+      const contactEmail = $('#contactEmail');
+      const contactGithub = $('#contactGithub');
+      if (state.contact && state.contact.email) {
+        contactEmail.href = 'mailto:' + state.contact.email;
+        contactEmail.lastChild.textContent = state.contact.email;
+      }
+      if (state.contact && state.contact.github) contactGithub.href = state.contact.github;
+
+      $('#editContactBtn').addEventListener('click', () => {
+        $('#editEmail').value = state.contact?.email || '';
+        $('#editGithub').value = state.contact?.github || '';
+        $('#editContactModal').classList.add('open');
+      });
+      $('#closeContactModal').addEventListener('click', () => $('#editContactModal').classList.remove('open'));
+      $('#editContactModal').addEventListener('click', e => { if (e.target === $('#editContactModal')) $('#editContactModal').classList.remove('open'); });
+      $('#submitContact').addEventListener('click', () => {
+        const email = $('#editEmail').value.trim();
+        const github = $('#editGithub').value.trim();
+        if (email) { contactEmail.href = 'mailto:' + email; contactEmail.lastChild.textContent = ' ' + email; }
+        if (github) contactGithub.href = github;
+        state.contact = { email, github };
+        saveState();
+        $('#editContactModal').classList.remove('open');
+      });
+
+      $('#footerYear').textContent = new Date().getFullYear();
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem('seanPortfolioState');
+          return raw ? JSON.parse(raw) : { tags: [], projects: [], timeline: null, bio: '', photo: null, contact: {} };
+        } catch { return { tags: [], projects: [], timeline: null, bio: '', photo: null, contact: {} }; }
+      }
+
+      function saveState() {
+        try { localStorage.setItem('seanPortfolioState', JSON.stringify(state)); } catch {}
+      }
+    });
+  </script>
+</body>
+</html>
